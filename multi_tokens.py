@@ -77,7 +77,7 @@ attribute(model, g, data, partial(nll_loss_diff, mean=True, loss=True), method='
 g.apply_topn(6500, absolute=True)
 g.prune_dead_nodes()
 
-# g.to_json('graph.json')
+g.to_json('graph.json')
 #
 # gz = g.to_graphviz()
 # gz.draw(f'graph.png', prog='dot')

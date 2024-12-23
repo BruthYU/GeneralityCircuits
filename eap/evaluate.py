@@ -98,6 +98,8 @@ def get_circuit_logits(model: HookedTransformer, graph: Graph, data: tuple, prun
         else:
             with model.hooks(fwd_hooks_clean + input_construction_hooks):
                 logits = model(clean_tokens, attention_mask=attention_mask)
+                pdb.set_trace()
+
 
     return logits
 

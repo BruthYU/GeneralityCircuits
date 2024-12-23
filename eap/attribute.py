@@ -470,8 +470,6 @@ def tokenize_plus(model: HookedTransformer, inputs: List[str], padding_side = 'r
 
 def process_input_feats(model: HookedTransformer, sentences, labels):
 
-
-
     # sentence_tokens
     tokenizer = model.tokenizer
     sentence_tokens, sentence_attention_masks, sentence_input_lengths, sentence_n_pos = tokenize_plus(model, sentences)
