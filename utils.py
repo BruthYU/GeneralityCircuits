@@ -19,7 +19,7 @@ from transformer_lens import HookedTransformer
 logger = logging.getLogger(__name__)
 
 
-GPT_J_NAME_SHORT = "gptj"  # A useful alias for the CLI.
+GPT_J_NAME_SHORT = "gpt-j-6B"  # A useful alias for the CLI.
 GPT_J_NAME = "EleutherAI/gpt-j-6B"
 
 GPT_NEO_X_NAME_SHORT = "neox"

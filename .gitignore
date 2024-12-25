@@ -25,3 +25,4 @@ __pycache__/
 /acdc/models/
 /tutorial/.cache/
 grammar.py
+/gpt-j-6b/

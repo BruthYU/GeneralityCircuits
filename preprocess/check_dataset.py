@@ -7,6 +7,8 @@ from tqdm import tqdm
 
 
 
-with open('datasets/MQuAKE-CF-circuits.json', 'r') as f:
+with open('datasets/gptj-answers-CF-3k.json', 'r') as f:
     dataset = json.load(f)
+with open('datasets/gptj-answers-CF-3k-multi.json', 'w') as f:
+    json.dump(dataset, f, ensure_ascii=False, indent=4)
 pass
