@@ -30,6 +30,18 @@ for item in mquake:
         }
         relation_id_dict[relation_id].append(info)
 
+
+P407_template = 'Which language was {} written in?'
+P407_subjects = ['Journey to the West', 'Dream of the Red Chamber', 'Romance of the Three Kingdoms']
+P407_answer = ['Chinese', 'zh', 'zho', 'Chinese language']
+for p407_subject in P407_subjects:
+    p407_info = {
+        'subject': p407_subject,
+        'question': P407_template.format(p407_subject),
+        'original_answers': ['Chinese', 'zh', 'zho', 'Chinese language']
+    }
+    relation_id_dict['P407'].append(p407_info)
+
 #load model
 from utils import load_model, get_model
 MODEL_NAME = "meta-llama/Llama-2-7b-chat-hf"
@@ -63,10 +75,15 @@ for item in tqdm(one_rewrite):
        clean_subject, clean_question = single_hop['subject'], single_hop['question']
        corrupted_subject = clean_subject
        corrupted_case = None
-       while corrupted_subject == clean_subject:
+       sample_times = 0
+       while corrupted_subject == clean_subject or single_hop['answer'] in corrupted_case['original_answers']:
            index = random.randint(0, len(relation_id_dict[relation_id]) - 1)
            corrupted_case = relation_id_dict[relation_id][index]
            corrupted_subject = corrupted_case['subject']
+           sample_times += 1
+           if sample_times > 1000:
+               print(relation_id)
+               break
 
        corrupted_question = clean_question.replace(clean_subject, corrupted_subject)
 

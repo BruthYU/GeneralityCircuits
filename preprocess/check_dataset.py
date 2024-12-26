@@ -5,20 +5,22 @@ import torch
 from transformers import AutoTokenizer, AutoModel
 from tqdm import tqdm
 import pandas as pd
-with open('datasets/MQuAKE-1R-corrupted.json', 'r') as f:
+import numpy as np
+with open('datasets/MQuAKE-1R-circuit.json', 'r') as f:
     mquake = json.load(f)
-wiki_df = pd.read_json('./datasets/count_paras_wiki.json')
-dolma_df = pd.read_json('./datasets/count_paras_wiki.json')
 
-with open('datasets/gptj-answers-CF-1R-single.json', 'r') as f:
-    single = json.load(f)
-with open('datasets/gptj-answers-CF-1R-multi.json', 'r') as f:
-    multi = json.load(f)
+gptj_identical = []
+identical_count = []
 
-subject_match = 0
-for x,y in zip(single,multi):
-    if x['subject'] in x['question']:
-        subject_match+=1
-
-print(subject_match)
+gptj_different = []
+different_count = []
+for item in mquake:
+    if item['gptj_identical']:
+        gptj_identical.append(item)
+        identical_count.append(item['wiki_count'] + item['dolma_count'])
+    else:
+        gptj_different.append(item)
+        different_count.append(item['wiki_count'] + item['dolma_count'])
+print(np.sort(identical_count))
+print(np.sort(different_count))
 pass
