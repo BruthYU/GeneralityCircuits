@@ -9,18 +9,12 @@ import numpy as np
 with open('datasets/MQuAKE-1R-circuit.json', 'r') as f:
     mquake = json.load(f)
 
-gptj_identical = []
-identical_count = []
+with open('prompts/rel-prompts.json', 'r') as f:
+    rel_prompts = json.load(f)
 
-gptj_different = []
-different_count = []
-for item in mquake:
-    if item['gptj_identical']:
-        gptj_identical.append(item)
-        identical_count.append(item['wiki_count'] + item['dolma_count'])
-    else:
-        gptj_different.append(item)
-        different_count.append(item['wiki_count'] + item['dolma_count'])
-print(np.sort(identical_count))
-print(np.sort(different_count))
+for x in rel_prompts.keys():
+    QAs = rel_prompts[x].split('\n')
+    rel_prompts[x] = QAs[0] + '\n' +QAs[1]
+with open('prompts/rel-prompts-short.json', 'w') as f:
+    json.dump(rel_prompts, f, indent=4)
 pass

@@ -1,4 +1,5 @@
 import math
+import pdb
 from typing import List, Dict, Union, Tuple, Literal, Optional, Set
 from collections import defaultdict
 from pathlib import Path 
@@ -357,6 +358,8 @@ class Graph:
         input_node = InputNode()
         graph.nodes[input_node.name] = input_node
         residual_stream = [input_node]
+
+
 
         for layer in range(graph.cfg['n_layers']):
             attn_nodes = [AttentionNode(layer, head) for head in range(graph.cfg['n_heads'])]

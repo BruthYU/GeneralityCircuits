@@ -462,6 +462,7 @@ def tokenize_plus(model: HookedTransformer, inputs: List[str], padding_side = 'r
             - input_lengths (torch.Tensor): The lengths of the tokenized inputs.
             - n_pos (int): The maximum sequence length of the tokenized inputs.
     """
+
     tokens = model.to_tokens(inputs, prepend_bos=True, padding_side=padding_side)
     attention_mask = get_attention_mask(model.tokenizer, tokens, True)
     input_lengths = attention_mask.sum(1)
@@ -548,7 +549,9 @@ def get_scores_eap_ig_tokens(model: HookedTransformer, graph: Graph, dataloader:
 
     total_steps = 0
     for step in range(1, steps+1):
+        torch.cuda.empty_cache()
         total_steps += 1
+
         with model.hooks(fwd_hooks=[(graph.nodes['input'].out_hook, input_interpolation_hook(step))], bwd_hooks=bwd_hooks):
             attention_mask = input_feats['backward_attention_masks'].unsqueeze(1)
             clean_logits = model(input_feats['input_tokens'][0], attention_mask=attention_mask[0])
@@ -557,6 +560,7 @@ def get_scores_eap_ig_tokens(model: HookedTransformer, graph: Graph, dataloader:
 
             metric_value = metric(clean_logits, input_feats['label_ids'])
             metric_value.backward()
+
 
     scores /= total_steps
     return scores
