@@ -4,7 +4,7 @@ import torch
 import transformer_lens.utils as utils
 import seaborn as sns
 import matplotlib.pyplot as plt
-
+import plotly.express as px
 plt.rcParams['font.sans-serif']=['Times New Roman']
 
 def draw_output_pattern_with_text(component, model, top_k=10):
@@ -32,6 +32,7 @@ def draw_output_pattern_with_text(component, model, top_k=10):
     # plt.ylabel('Logits')
     # plt.title('Top Tokens Logits Heatmap')
     plt.show()
+
 def draw_attention_pattern(Component,model,layer,head_index):
     fig = px.imshow(
         Component.cache["attn", layer][0, head_index][1:, 1:].cpu().numpy(),
@@ -57,6 +58,7 @@ def draw_attention_pattern(Component,model,layer,head_index):
     )
     # fig.write_image(f"{layer}.{head_index}_Attention.pdf")
     fig.show()
+
 def draw_rank_logits(gpt2_medium, China):
     x=np.arange(gpt2_medium.cfg.n_layers+1)
     fig=plt.figure(figsize=(8,4),dpi=100)

@@ -627,3 +627,35 @@ def circuits_Union(clean_graph: Graph, graph_A: Graph, graph_B: Graph):
     clean_graph.prune_dead_nodes()
 
     return clean_graph
+
+def circuits_List_Union(clean_graph: Graph, graph_list: List[Graph]):
+    assert all([clean_graph.keys_equal(x) for x in graph_list]), \
+        'Graphs are generated from two different models. No overlapping nodes or edges are returned.'
+
+    edge_names = graph_list[0].edges.keys()
+
+    for name in edge_names:
+        in_graph_flag = any([x.edges[name].in_graph for x in graph_list])
+        clean_graph.edges[name].in_graph = in_graph_flag
+
+    clean_graph.recover_nodes_from_edges()
+    clean_graph.prune_dead_nodes()
+
+    return clean_graph
+
+
+def circuits_List_Intersection(clean_graph: Graph, graph_list: List[Graph]):
+    assert all([clean_graph.keys_equal(x) for x in graph_list]), \
+        'Graphs are generated from two different models. No overlapping nodes or edges are returned.'
+
+    edge_names = graph_list[0].edges.keys()
+
+    for name in edge_names:
+        in_graph_flag = all([x.edges[name].in_graph for x in graph_list])
+        clean_graph.edges[name].in_graph = in_graph_flag
+
+    clean_graph.recover_nodes_from_edges()
+    clean_graph.prune_dead_nodes()
+
+    return clean_graph
+
