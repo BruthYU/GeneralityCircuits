@@ -1,3 +1,1 @@
-Q: What is the country where The Rotunda is located? A: United States of America
-Q: In which country was Tohar Butbul granted citizenship? A: Israel
-Q: Who was Nissan 200SX created by? A: Nissan
+You are powerful to answer multi-hop questions. Users will provide a question generated from Wikidata triples, and you will help write an entity as the answer.
