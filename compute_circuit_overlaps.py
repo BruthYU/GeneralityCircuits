@@ -19,7 +19,9 @@ from typing import List
 import json
 from eap.graph import circuits_List_Union, circuits_List_Intersection
 from tqdm import tqdm
-
+# os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+os.environ['http_proxy'] = '127.0.0.1:7890'
+os.environ['https_proxy'] = '127.0.0.1:7890'
 with open('preprocess/prompts/rel-prompts.json','r') as f:
     rel_prompts = json.load(f)
 with open('preprocess/prompts/multihop-prompts.txt','r') as f:
@@ -39,8 +41,16 @@ model = get_model(short_name, hf_model=hf_model, tokenizer=tokenizer)
 
 
 
+
+wrong_idx = [552, 843, 941, 1045, 1061, 1087, 1089, 1198, 1204, 1228, 1282, 1362, 1480, 1486, 1593, 1765, 1790, 1794, 1831, 1836,
+             1837, 1486, 1593, 1765, 1790, 1794, 1831, 1836, 1837, 1897, 1952, 1977, 2022, 2035, 2059, 2116, 2154, 2177, 2212, 2250,
+             2286, 2322, 2326, 2371, 2390, 2569, 2661, 2684, 2716, 2810, 2916, 2932, 2998, 11, 277, 308, 477, 572, 654, 655, 662, 709,
+             716, 843, 941, 974, 1008, 1045, 1087, 1089, 1104, 1139, 1146, 1228, 1248, 1351, 1362, 1379, 1387, 1405, 1410, 1480, 1486, 1493,
+             1526, 1593, 1783, 1790, 1794, 1836, 1837, 1956, 1960, 1977, 2002, 2035, 2059, 2071, 2073, 2078, 2093, 2097, 2118, 2154, 2177, 2212,
+             2217, 2250, 2286, 2312, 2314, 2333, 2340, 2369, 2377, 2390,
+             2447, 2488, 2515, 2582, 2619, 2661, 2676, 2683, 2704, 2716, 2759, 2760, 2794, 2810, 2890, 2916, 2967, 2999]
+
 identical = []
-wrong_idx = [843, 2035, 2177, 2250, 2716, 2810, 2916]
 for idx, item in enumerate(mquake):
     if not item['gpt2-medium_identical'] or idx in wrong_idx:
         continue
@@ -63,9 +73,11 @@ for idx, item in enumerate(mquake):
     attribute(model, mh_g, data, partial(nll_loss_diff, mean=True, loss=True),
               method='EAP-IG-tokens', ig_steps=10)
 
-    pdb.set_trace()
-    mh_g.apply_topn(6500, absolute=True)
-    mh_g.prune_dead_nodes()
+
+    mh_g.apply_topn(5000, absolute=True)
+
+    # mh_g.prune_dead_nodes()
+
 
 
 
@@ -84,17 +96,20 @@ for idx, item in enumerate(mquake):
         data = (sentences, labels)
 
         g = Graph.from_model(model)
+
         attribute(model, g, data, partial(nll_loss_diff, mean=True, loss=True),
                   method='EAP-IG-tokens', ig_steps=10)
 
-        g.apply_topn(6500, absolute=True)
-        g.prune_dead_nodes()
+        g.apply_topn(5000, absolute=True)
+
+        # g.prune_dead_nodes()
+
         single_hop_circuits.append(g)
 
         # intersect(one single-hop, multi-hop)
         clean_graph = Graph.from_model(model)
         intersect_graph = circuits_List_Intersection(clean_graph, [g, mh_g])
-        pdb.set_trace()
+
         edge_overlap_rate = intersect_graph.count_included_edges() / (g.count_included_edges() +
                                                      mh_g.count_included_edges() - intersect_graph.count_included_edges())
         node_overlap_rate = intersect_graph.count_included_nodes() / (g.count_included_nodes() +
@@ -115,7 +130,10 @@ for idx, item in enumerate(mquake):
     item['edge_overlap_rate'] = edge_overlap_rate
     item['node_overlap_rate'] = node_overlap_rate
     identical.append(item)
-    print(f"----[Item {idx}]---- edge_overlap_rate: {edge_overlap_rate} | node_overlap_rate: {node_overlap_rate}")
+    # print(f"----[Item {idx}]---- edge_overlap_rate: {edge_overlap_rate} | "
+    #       f"node_overlap_rate: {node_overlap_rate} | wiki & dolma count: {item['wiki_count'] + item['dolma_count']}")
+
+    print(f"----[Item {idx}]---- edge_overlap_rate: {edge_overlap_rate} | wiki & dolma count: {item['wiki_count'] + item['dolma_count']}")
 
 
 

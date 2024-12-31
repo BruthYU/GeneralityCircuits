@@ -318,6 +318,8 @@ class Graph:
     def prune_dead_nodes(self, prune_childless=True, prune_parentless=True):
         self.nodes['logits'].in_graph = any(parent_edge.in_graph for parent_edge in self.nodes['logits'].parent_edges)
 
+
+
         for node in reversed(self.nodes.values()):
             if isinstance(node, LogitNode):
                 continue 
@@ -341,6 +343,7 @@ class Graph:
                     node.in_graph = False 
                     for child_edge in node.child_edges:
                         child_edge.in_graph = False
+        pass
 
 
     @classmethod

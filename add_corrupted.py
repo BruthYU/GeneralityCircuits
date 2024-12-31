@@ -1,3 +1,5 @@
+import pdb
+
 import torch
 from typing import List
 import json
@@ -42,6 +44,10 @@ for p407_subject in P407_subjects:
     }
     relation_id_dict['P407'].append(p407_info)
 
+for idx, x in enumerate(relation_id_dict['P27']):
+    if x['subject'] == 'England':
+        print(idx)
+
 #load model
 from utils import load_model, get_model
 short_name = "gpt2-medium"
@@ -77,7 +83,7 @@ def sample_corrupted_triple(clean_subject, relation_id, clean_object):
             break
     return corrupted_case
 
-wrong_info = [843, 2035, 2177, 2250, 2716, 2810, 2916, 'single_552', 'global_843', 'global_941', 'single_1045', 'single_1061',
+wrong_info = ['single_552', 'global_843', 'global_941', 'single_1045', 'single_1061',
               'single_1087', 'single_1089', 'single_1198', 'single_1204', 'single_1228', 'global_1282', 'single_1362', 'single_1480',
               'single_1486', 'single_1593', 'single_1765', 'single_1790', 'single_1794', 'single_1831', 'single_1836', 'single_1837',
               'single_1486', 'single_1593', 'single_1765', 'single_1790', 'single_1794', 'single_1831', 'single_1836', 'single_1837',
@@ -90,13 +96,14 @@ for idx, item in enumerate(tqdm(mquake)):
        relation_id = single_hop['relation_id']
        clean_subject, clean_question = single_hop['subject'], single_hop['question']
 
-       generate_ans = single_hop['answer']
+       generate_ans = single_hop[f'{short_name}_answer']
        corrupted_question = ""
 
 
        generate_count = 0
        while generate_ans == single_hop[f'{short_name}_answer']:
-           corrupted_case = sample_corrupted_triple(clean_subject, relation_id, single_hop['answer'])
+           corrupted_case = sample_corrupted_triple(clean_subject, relation_id, single_hop[f'{short_name}_answer'])
+
            corrupted_question = clean_question.replace(clean_subject, corrupted_case['subject'])
 
            rel_prompt = rel_prompts[relation_id]
@@ -113,6 +120,8 @@ for idx, item in enumerate(tqdm(mquake)):
                wrong_info.append(f"single_{idx}")
                break
 
+
+
        single_hop['corrupted_question'],single_hop[f'corrupted_{short_name}_answer'] \
            = corrupted_question, generate_ans
 
@@ -121,13 +130,15 @@ for idx, item in enumerate(tqdm(mquake)):
     single_gt = item['single_hops'][explict_index]
     relation_id = single_gt['relation_id']
     clean_subject, clean_question = single_gt['subject'], item['questions'][0]
-    generate_ans = item['answer']
-    corrupted_question = ""
+    generate_ans = item[f'{short_name}_answer']
 
+
+    corrupted_question = ""
     generate_count = 0
     while generate_ans == item[f'{short_name}_answer']:
-        corrupted_case = sample_corrupted_triple(clean_subject, relation_id, item['answer'])
+        corrupted_case = sample_corrupted_triple(clean_subject, relation_id, item[f'{short_name}_answer'])
         corrupted_question = clean_question.replace(clean_subject, corrupted_case['subject'])
+
         prompt = [multihop_prompt + "\n\nQ: " + corrupted_question + ' A:']
         inputs = tokenizer(prompt, return_tensors="pt", padding=True).to(hf_model.device)
         generate_ids = hf_model.generate(**inputs, max_new_tokens=10, pad_token_id=tokenizer.eos_token_id,stopping_criteria=stopping_criteria)
